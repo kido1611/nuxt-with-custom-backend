@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 \App\Http\Middleware\ForceApiJsonMiddleware::class,
             ]
         );
+
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
