@@ -57,6 +57,6 @@ class NoteController extends Controller
         \Illuminate\Support\Facades\Gate::authorize('delete', $note);
         $note->delete();
 
-        return response();
+        return response()->noContent();
     }
 }
