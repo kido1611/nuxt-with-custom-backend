@@ -13,3 +13,6 @@ Route::apiResource('notes', \App\Http\Controllers\Api\NoteController::class)
 Route::post('/auth/register', \App\Http\Controllers\Api\RegisterController::class)
     ->name('auth.register')
     ->middleware(['guest']);
+Route::post('/auth/login', \App\Http\Controllers\Api\LoginController::class)
+    ->name('auth.login')
+    ->middleware(['guest']);
