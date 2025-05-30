@@ -9,3 +9,7 @@ Route::get('/user', function (Request $request) {
 
 Route::apiResource('notes', \App\Http\Controllers\Api\NoteController::class)
     ->middleware(['auth:sanctum']);
+
+Route::post('/auth/register', \App\Http\Controllers\Api\RegisterController::class)
+    ->name('auth.register')
+    ->middleware(['guest']);
