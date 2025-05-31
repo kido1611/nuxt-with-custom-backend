@@ -10,11 +10,12 @@ export default defineNuxtConfig({
   sanctum: {
     baseUrl: "http://localhost:8000",
     endpoints: {
-      login: "/api/login",
-      logout: "/api/logout",
+      login: "/api/auth/login",
+      logout: "/api/auth/logout",
     },
     redirect: {
       onLogin: "/dashboard",
+      onGuestOnly: "/dashboard",
     },
   },
 });

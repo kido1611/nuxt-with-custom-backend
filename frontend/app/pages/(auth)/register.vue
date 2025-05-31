@@ -1,19 +1,42 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
+import type { FormSubmitEvent, FormError } from "@nuxt/ui";
 import { RegisterSchema, type RegisterType } from "~/types";
 
 definePageMeta({
   layout: "auth",
+  middleware: ["sanctum:guest"],
 });
 
+const client = useSanctumClient();
+const toast = useToast();
+const form = useTemplateRef("form");
+
 const state = reactive({
-  name: "",
-  email: "",
-  password: "",
+  name: "ahmad",
+  email: "ahmad@local.host",
+  password: "password",
 });
 
 async function onSubmit(event: FormSubmitEvent<RegisterType>) {
-  console.log(event.data);
+  form.value?.clear();
+
+  try {
+    await client("/api/auth/register", {
+      method: "POST",
+      body: event.data,
+    });
+    // TODO: fix type
+  } catch (error: any) {
+    toast.add({
+      title: "Error",
+      description: error.data.message,
+      color: "error",
+    });
+
+    const errors: FormError[] = parseError(error.data.errors);
+
+    form.value?.setErrors(errors);
+  }
 }
 </script>
 
@@ -22,6 +45,7 @@ async function onSubmit(event: FormSubmitEvent<RegisterType>) {
     <h1 class="text-4xl">Register</h1>
 
     <UForm
+      ref="form"
       :schema="RegisterSchema"
       :state
       @submit="onSubmit"

@@ -1,18 +1,39 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
+import type { FormSubmitEvent, FormError } from "@nuxt/ui";
 import { LoginSchema, type LoginType } from "~/types";
 
 definePageMeta({
   layout: "auth",
+  middleware: ["sanctum:guest"],
 });
 
+const toast = useToast();
+const form = useTemplateRef("form");
+
+const { login } = useSanctumAuth();
+
 const state = reactive({
-  email: "",
-  password: "",
+  email: "ahmad@local.host",
+  password: "password",
 });
 
 async function onSubmit(event: FormSubmitEvent<LoginType>) {
-  console.info(event.data);
+  form.value?.clear();
+
+  try {
+    await login(event.data);
+    // TODO: fix type
+  } catch (error: any) {
+    toast.add({
+      title: "Error",
+      description: error.data.message,
+      color: "error",
+    });
+
+    const errors: FormError[] = parseError(error.data.errors);
+
+    form.value?.setErrors(errors);
+  }
 }
 </script>
 
@@ -20,6 +41,7 @@ async function onSubmit(event: FormSubmitEvent<LoginType>) {
   <div class="flex flex-col gap-y-8">
     <h1 class="text-4xl">Login</h1>
     <UForm
+      ref="form"
       :schema="LoginSchema"
       :state
       @submit="onSubmit"
