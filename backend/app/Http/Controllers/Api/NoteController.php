@@ -25,6 +25,7 @@ class NoteController extends Controller
     public function store(NoteCreateRequest $request)
     {
         $validatedData = $request->validated();
+        $validatedData['user_id'] = $request->user()->id;
 
         $note = Note::create($validatedData);
 
