@@ -25,6 +25,13 @@ async function onSubmit(event: FormSubmitEvent<RegisterType>) {
       method: "POST",
       body: event.data,
     });
+
+    await navigateTo("/login");
+
+    toast.add({
+      title: "Success",
+      color: "success",
+    });
     // TODO: fix type
   } catch (error: any) {
     toast.add({
