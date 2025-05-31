@@ -14,6 +14,9 @@ importers:
       nuxt:
         specifier: ^3.17.4
         version: 3.17.4(@parcel/watcher@2.5.1)(@types/node@22.15.27)(db0@0.3.2)(ioredis@5.6.1)(lightningcss@1.30.1)(magicast@0.3.5)(rollup@4.41.1)(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.27)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(yaml@2.8.0))(yaml@2.8.0)
+      nuxt-auth-sanctum:
+        specifier: 0.6.7
+        version: 0.6.7
       tailwindcss:
         specifier: ^4.1.8
         version: 4.1.8
@@ -2905,6 +2908,9 @@ packages:
 
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
+
+  nuxt-auth-sanctum@0.6.7:
+    resolution: {integrity: sha512-LLhgTW/ITqliyxMxCxFvH1+1Y2U0Cs+uk1X55pM73i8a83VeW8yaZM1jLBvj35ugz+cN6YRwpSYsMu8VqRUXCA==}
 
   nuxt@3.17.4:
     resolution: {integrity: sha512-49tkp7/+QVhuEOFoTDVvNV6Pc5+aI7wWjZHXzLUrt3tlWLPFh0yYbNXOc3kaxir1FuhRQHHyHZ7azCPmGukfFg==}
@@ -7324,6 +7330,12 @@ snapshots:
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
+
+  nuxt-auth-sanctum@0.6.7:
+    dependencies:
+      defu: 6.1.4
+      ofetch: 1.4.1
+      pathe: 2.0.3
 
   nuxt@3.17.4(@parcel/watcher@2.5.1)(@types/node@22.15.27)(db0@0.3.2)(ioredis@5.6.1)(lightningcss@1.30.1)(magicast@0.3.5)(rollup@4.41.1)(terser@5.40.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.27)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(yaml@2.8.0))(yaml@2.8.0):
     dependencies:
