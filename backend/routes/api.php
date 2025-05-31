@@ -16,3 +16,6 @@ Route::post('/auth/register', \App\Http\Controllers\Api\RegisterController::clas
 Route::post('/auth/login', \App\Http\Controllers\Api\LoginController::class)
     ->name('auth.login')
     ->middleware(['guest']);
+Route::post('/auth/logout', \App\Http\Controllers\Api\AuthLogoutController::class)
+    ->name('auth.logout')
+    ->middleware(['auth:sanctum']);
