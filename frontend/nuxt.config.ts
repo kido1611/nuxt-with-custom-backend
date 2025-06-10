@@ -18,9 +18,8 @@ export default defineNuxtConfig({
       onGuestOnly: "/dashboard",
     },
   },
-  routeRules: {
-    "/api/laravel/**": {
-      proxy: "http://localhost:8000/**",
-    },
+  runtimeConfig: {
+    // can be override using env. NUXT_API_URL
+    apiUrl: "http://localhost:8000",
   },
 });
