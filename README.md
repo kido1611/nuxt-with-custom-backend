@@ -1,6 +1,6 @@
 # User Notes Applications
 
-Example of nuxt + laravel. 
+Example of Nuxt (Frontend0 + Laravel (Backend), using Laravel Sanctum SPA mode
 
 ## Used library
 
