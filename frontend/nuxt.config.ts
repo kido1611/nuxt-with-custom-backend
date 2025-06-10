@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   sanctum: {
-    baseUrl: "http://localhost:8000",
+    baseUrl: "/api/laravel",
     endpoints: {
       login: "/api/auth/login",
       logout: "/api/auth/logout",
@@ -16,6 +16,11 @@ export default defineNuxtConfig({
     redirect: {
       onLogin: "/dashboard",
       onGuestOnly: "/dashboard",
+    },
+  },
+  routeRules: {
+    "/api/laravel/**": {
+      proxy: "http://localhost:8000/**",
     },
   },
 });
