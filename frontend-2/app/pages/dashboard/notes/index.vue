@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { useApiLaravel } from "~/compossables/useApiLaravel";
 import type { ApiCollectionResponse, NoteResponse } from "~/types";
 
 definePageMeta({
   layout: "dashboard",
-  middleware: ["sanctum:auth"],
+  middleware: ["laravel-auth"],
 });
 
 const { data, status, error, refresh } =
-  await useSanctumFetch<ApiCollectionResponse<NoteResponse>>("/api/notes");
+  await useApiLaravel<ApiCollectionResponse<NoteResponse>>("/api/notes");
 
 async function refreshNotes() {
   await refresh();

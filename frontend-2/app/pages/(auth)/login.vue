@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { FormSubmitEvent, FormError } from "@nuxt/ui";
+import { useAuth } from "~/compossables/useAuth";
 import { LoginSchema, type LoginType } from "~/types";
 
 definePageMeta({
   layout: "auth",
-  middleware: ["sanctum:guest"],
+  middleware: ["laravel-guest"],
 });
 
 const toast = useToast();
 const form = useTemplateRef("form");
 
-const { login } = useSanctumAuth();
+const { login } = useAuth();
 
 const state = reactive({
   email: "ahmad@local.host",
@@ -22,8 +23,11 @@ async function onSubmit(event: FormSubmitEvent<LoginType>) {
 
   try {
     await login(event.data);
+
+    await navigateTo("/dashboard");
     // TODO: fix type
   } catch (error: any) {
+    console.log(error, error.data);
     toast.add({
       title: "Error",
       description: error.data.message,

@@ -1,5 +1,9 @@
 import * as v from "valibot";
 
+export type User = {
+  name: string;
+};
+
 export const LoginSchema = v.object({
   email: v.pipe(v.string(), v.trim(), v.email(), v.maxLength(100)),
   password: v.pipe(v.string(), v.trim(), v.minLength(8), v.maxLength(32)),

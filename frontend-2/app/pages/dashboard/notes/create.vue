@@ -5,11 +5,11 @@ import { NoteSchema } from "~/types";
 
 definePageMeta({
   layout: "dashboard",
-  middleware: ["sanctum:auth"],
+  middleware: ["laravel-auth"],
 });
 
 const toast = useToast();
-const client = useSanctumClient();
+const client = useNuxtApp().$apiLaravel;
 const form = useTemplateRef("form");
 
 const state = reactive({

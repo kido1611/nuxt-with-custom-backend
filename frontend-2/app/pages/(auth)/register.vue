@@ -4,10 +4,10 @@ import { RegisterSchema, type RegisterType } from "~/types";
 
 definePageMeta({
   layout: "auth",
-  middleware: ["sanctum:guest"],
+  middleware: ["laravel-guest"],
 });
 
-const client = useSanctumClient();
+const client = useNuxtApp().$apiLaravel;
 const toast = useToast();
 const form = useTemplateRef("form");
 

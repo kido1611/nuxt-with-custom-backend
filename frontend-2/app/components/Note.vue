@@ -4,7 +4,7 @@ const { note } = defineProps<{
   note: NoteResponse;
 }>();
 
-const client = useSanctumClient();
+const client = useNuxtApp().$apiLaravel;
 const toast = useToast();
 
 const emit = defineEmits<{

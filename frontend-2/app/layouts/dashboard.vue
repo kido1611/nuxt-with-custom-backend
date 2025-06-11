@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import type { UserResponse } from "~/types";
+import { useAuth } from "~/compossables/useAuth";
 
-const { logout } = useSanctumAuth();
-const user = useSanctumUser<UserResponse>();
+const { logout: logoutUser, user } = useAuth();
+
+async function logout() {
+  await logoutUser();
+  await navigateTo("/login");
+}
 </script>
 
 <template>
