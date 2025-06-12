@@ -1,0 +1,21 @@
+CREATE TABLE notes (
+  id VARCHAR NOT NULL PRIMARY KEY,
+  user_id VARCHAR NOT NULL,
+  title VARCHAR NOT NULL,
+  description TEXT,
+  visible_at DATETIME,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  deleted_at DATETIME,
+
+  FOREIGN KEY("user_id") REFERENCES users ("id") ON DELETE CASCADE
+);
+
+CREATE TRIGGER update_notes_updated_at
+  AFTER UPDATE ON notes
+  FOR EACH ROW
+BEGIN
+  UPDATE notes
+  SET updated_at = CURRENT_TIMESTAMP
+  WHERE id = OLD.id;
+END;
