@@ -4,5 +4,8 @@
   },
   "database": {
     "url": "sqlite://db.sqlite"
+  },
+  "log": {
+    "level": 6
   }
 }
