@@ -3,6 +3,7 @@
     "port": 8000
   },
   "database": {
+    "driver": "sqlite",
     "url": "sqlite://db.sqlite"
   },
   "log": {
