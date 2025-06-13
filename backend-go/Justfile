@@ -1,6 +1,8 @@
 set shell := ["sh", "-c"]
 set dotenv-load
 
+DATABASE_URL := "${DATABASE_DRIVER}://${DATABASE_HOST}"
+
 [doc('Show this help message')]
 help:
   @just --list
@@ -51,20 +53,20 @@ make-migration name: check_tool_migrate
 [doc("Running database migrations")]
 migrate-up: check_tool_migrate
   @echo "Running migrations..."
-  @migrate -database ${DATABASE_URL} -path internal/db/migrations up
+  @migrate -database {{DATABASE_URL}} -path internal/db/migrations up
 
 [group('migration')]
 [doc("Rollback migrations")]
 migrate-down: check_tool_migrate
   @echo "Running migrations..."
-  @migrate -database ${DATABASE_URL} -path internal/db/migrations down
+  @migrate -database {{DATABASE_URL}} -path internal/db/migrations down
 
 [group('migration')]
 [doc("Recreate database")]
 [confirm("Are you sure want to drop this? [y/N]")]
 migrate-fresh: check_tool_migrate && migrate-up
   @echo "Dropping database..."
-  @migrate -database ${DATABASE_URL} -path internal/db/migrations drop -f
+  @migrate -database {{DATABASE_URL}} -path internal/db/migrations drop -f
 
 [private]
 check_tool_sqlc:

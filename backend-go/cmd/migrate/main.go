@@ -14,8 +14,9 @@ func main() {
 	// https://github.com/golang-migrate/migrate?tab=readme-ov-file#use-in-your-go-project
 	// log := config.NewLogrus(viper)
 	// db := config.NewDB(viper, log)
+	schema := viper.GetString("database.driver") + "://" + viper.GetString("database.host")
 
-	m, err := migrate.New("file://internal/db/migrations", viper.GetString("database.url"))
+	m, err := migrate.New("file://internal/db/migrations", schema)
 	if err != nil {
 		panic(fmt.Errorf("failed when reading migrations: %w", err))
 	}
