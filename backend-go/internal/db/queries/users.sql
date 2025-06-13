@@ -8,3 +8,7 @@ INSERT INTO users
 VALUES
 (?, ?, ?, ?)
 RETURNING *;
+
+-- name: CountUserByEmail :one
+SELECT count(*) FROM users
+WHERE email = ?
