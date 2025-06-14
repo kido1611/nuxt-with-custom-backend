@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Note struct {
@@ -17,6 +18,18 @@ type Note struct {
 	CreatedAt   sql.NullTime
 	UpdatedAt   sql.NullTime
 	DeletedAt   sql.NullTime
+}
+
+type Session struct {
+	ID             string
+	UserID         sql.NullString
+	CsrfToken      string
+	IpAddress      sql.NullString
+	UserAgent      sql.NullString
+	ExpiredAt      time.Time
+	LastActivityAt sql.NullTime
+	CreatedAt      sql.NullTime
+	UpdatedAt      sql.NullTime
 }
 
 type User struct {
