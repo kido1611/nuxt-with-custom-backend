@@ -107,61 +107,12 @@ func (u *UserUseCase) Create(ctx context.Context, request *model.RegisterUserReq
 		user, err := u.UserRepository.CreateUser(ctx, query, data)
 		return &user, err
 	})
-	// tx, err := u.DB.Begin()
-	// if err != nil {
-	// 	u.Log.Warnf("Failed starting database transaction: %+v", err)
-	// 	return nil, fiber.ErrInternalServerError
-	// }
-	// defer tx.Rollback()
-	//
-	// queries := sqlc.New(u.DB)
-	// qtx := queries.WithTx(tx)
-	//
-	// total, err := u.UserRepository.CountUserByEmail(ctx, qtx, request.Email)
-	// if err != nil {
-	// 	u.Log.Warnf("Failed count user from database: %+v", err)
-	// 	return nil, fiber.ErrInternalServerError
-	// }
-	//
-	// if total > 0 {
-	// 	u.Log.Warn("User already exist")
-	// 	return nil, fiber.ErrConflict
-	// }
-	//
-	// hash, err := argon2id.CreateHash(request.Password, argon2id.DefaultParams)
-	// if err != nil {
-	// 	u.Log.Warnf("Failed create password hash: %+v", err)
-	// 	return nil, fiber.ErrInternalServerError
-	// }
-	//
-	// uuid, err := uuid.NewV7()
-	// if err != nil {
-	// 	u.Log.Warnf("Failed generate UUID: %+v", err)
-	// 	return nil, fiber.ErrInternalServerError
-	// }
-	//
-	// uuidString := uuid.String()
-	//
-	// data := sqlc.CreateUserParams{
-	// 	ID:       uuidString,
-	// 	Name:     request.Name,
-	// 	Email:    request.Email,
-	// 	Password: hash,
-	// }
-	//
-	// user, err := u.UserRepository.CreateUser(ctx, qtx, data)
 	if err != nil {
 		u.Log.Warnf("Failed insert user to database: %+v", err)
 		return nil, err
 	}
 
 	userResponse := converter.UserToResponse(user)
-
-	// err = tx.Commit()
-	// if err != nil {
-	// 	u.Log.Warnf("Failed commit database: %+v", err)
-	// 	return nil, fiber.ErrInternalServerError
-	// }
 
 	return userResponse, nil
 }
