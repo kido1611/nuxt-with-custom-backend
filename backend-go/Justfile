@@ -68,6 +68,16 @@ migrate-fresh: check_tool_migrate && migrate-up
   @echo "Dropping database..."
   @migrate -database {{DATABASE_URL}} -path internal/db/migrations drop -f
 
+[group('test')]
+[doc("Integration testing using Hurl")]
+test-hurl: check_tool_hurl
+  @echo "Test using Hurl"
+  @hurl tests/hurl/ --no-output
+
+[private]
+check_tool_hurl:
+  @just check_tool hurl
+
 [private]
 check_tool_sqlc:
   @just check_tool sqlc github.com/sqlc-dev/sqlc/cmd/sqlc@latest
@@ -85,9 +95,10 @@ check_tool_staticcheck:
   @just check_tool staticcheck honnef.co/go/tools/cmd/staticcheck@latest
 
 [private]
-check_tool name url:
+check_tool name url="":
   @if ! which {{ name }} &> /dev/null; then \
     echo "{{ BOLD }}{{ name }}{{ NORMAL }} is not installed."; \
+    if [ "{{url}}" == "" ]; then exit 1; fi; \
     just install {{ name }} {{ url }}; \
   fi 
 
