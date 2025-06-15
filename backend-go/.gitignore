@@ -3,3 +3,4 @@ db.sqlite
 vendor/
 bin/
 tmp/
+session.json

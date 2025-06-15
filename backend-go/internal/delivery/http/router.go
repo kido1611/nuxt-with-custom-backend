@@ -3,6 +3,8 @@ package http
 import (
 	"database/sql"
 	"kido1611/notes-backend-go/internal/delivery/http/controller"
+	"kido1611/notes-backend-go/internal/delivery/http/middleware"
+	"kido1611/notes-backend-go/internal/delivery/http/session"
 	"kido1611/notes-backend-go/internal/repository"
 	"kido1611/notes-backend-go/internal/usecase"
 
@@ -15,8 +17,11 @@ type Router struct {
 	App            *fiber.App
 	Validate       *validator.Validate
 	Log            *logrus.Logger
+	SessionManager session.SessionManager
 	HomeController *controller.HomeController
 	AuthController *controller.AuthController
+	UserController *controller.UserController
+	SessionUsecase *usecase.SessionUseCase
 }
 
 func NewRouter(
@@ -26,24 +31,48 @@ func NewRouter(
 	log *logrus.Logger,
 ) *Router {
 	userRepository := repository.NewUserRepository()
+	sessionRepository := repository.NewSessionRepository()
+
+	sessionManager := session.NewDbSessionManager(DB, log, sessionRepository)
 
 	userUseCase := usecase.NewUserUseCase(DB, validate, log, userRepository)
+	sessionUseCaase := usecase.NewSessionUseCase(DB, log, sessionManager, userRepository)
 
 	homeController := controller.NewHomeController()
-	authController := controller.NewAuthController(log, userUseCase)
+	authController := controller.NewAuthController(log, userUseCase, sessionManager)
+	userController := controller.NewUserController(log)
 
 	return &Router{
 		App:            app,
+		Validate:       validate,
+		Log:            log,
+		SessionManager: sessionManager,
 		HomeController: homeController,
 		AuthController: authController,
+		UserController: userController,
+		SessionUsecase: sessionUseCaase,
 	}
 }
 
 func (r *Router) Setup() {
+	r.App.Use(middleware.NewSession(r.Log, r.SessionUsecase))
+	r.App.Use(middleware.NewCsrfMiddleware())
+	r.App.Get("/health", r.HomeController.Index)
+	r.App.Get("/sanctum/csrf-cookie", r.AuthController.CsrfToken)
 	r.SetupGuestRoutes()
+	r.SetupAuthRoutes()
 }
 
 func (r *Router) SetupGuestRoutes() {
-	r.App.Get("/", r.HomeController.Index)
-	r.App.Post("/auth/register", r.AuthController.Register)
+	// api := r.App.Group("/api/auth", middleware.NewGuestSession(r.Log))
+	r.App.Post("/api/auth/register", middleware.NewGuestSession(r.Log), r.AuthController.Register)
+	r.App.Post("/api/auth/login", middleware.NewGuestSession(r.Log), r.AuthController.Login)
+}
+
+func (r *Router) SetupAuthRoutes() {
+	api := r.App.Group("/api/user", middleware.NewAuthSession(r.Log))
+	api.Get("/", r.UserController.GetUser)
+
+	// apiAuth := r.App.Group("/api/auth/logout", middleware.NewAuthSession(r.Log))
+	r.App.Delete("/api/auth/logout", middleware.NewAuthSession(r.Log), r.AuthController.Logout)
 }

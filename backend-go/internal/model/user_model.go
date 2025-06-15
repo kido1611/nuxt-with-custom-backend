@@ -6,6 +6,11 @@ type RegisterUserRequest struct {
 	Password string `json:"password" validate:"required,max=100"`
 }
 
+type LoginUserRequest struct {
+	Email    string `json:"email" validate:"required,max=100"`
+	Password string `json:"password" validate:"required,max=100"`
+}
+
 type UserResponse struct {
 	Id        string `json:"id,omitempty"`
 	Name      string `json:"name,omitempty"`
