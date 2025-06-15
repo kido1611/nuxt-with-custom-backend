@@ -18,10 +18,11 @@ type Router struct {
 	Validate       *validator.Validate
 	Log            *logrus.Logger
 	SessionManager session.SessionManager
+	SessionUsecase *usecase.SessionUseCase
 	HomeController *controller.HomeController
 	AuthController *controller.AuthController
 	UserController *controller.UserController
-	SessionUsecase *usecase.SessionUseCase
+	noteController *controller.NoteController
 }
 
 func NewRouter(
@@ -32,25 +33,29 @@ func NewRouter(
 ) *Router {
 	userRepository := repository.NewUserRepository()
 	sessionRepository := repository.NewSessionRepository()
+	noteRepository := repository.NewNoteRepository()
 
 	sessionManager := session.NewDbSessionManager(DB, log, sessionRepository)
 
 	userUseCase := usecase.NewUserUseCase(DB, validate, log, userRepository)
-	sessionUseCaase := usecase.NewSessionUseCase(DB, log, sessionManager, userRepository)
+	sessionUseCase := usecase.NewSessionUseCase(DB, log, sessionManager, userRepository)
+	noteUsecase := usecase.NewNoteUsecase(DB, log, validate, noteRepository)
 
 	homeController := controller.NewHomeController()
 	authController := controller.NewAuthController(log, userUseCase, sessionManager)
 	userController := controller.NewUserController(log)
+	noteController := controller.NewNoteController(log, noteUsecase)
 
 	return &Router{
 		App:            app,
 		Validate:       validate,
 		Log:            log,
 		SessionManager: sessionManager,
+		SessionUsecase: sessionUseCase,
 		HomeController: homeController,
 		AuthController: authController,
 		UserController: userController,
-		SessionUsecase: sessionUseCaase,
+		noteController: noteController,
 	}
 }
 
@@ -73,6 +78,10 @@ func (r *Router) SetupAuthRoutes() {
 	api := r.App.Group("/api/user", middleware.NewAuthSession(r.Log))
 	api.Get("/", r.UserController.GetUser)
 
-	// apiAuth := r.App.Group("/api/auth/logout", middleware.NewAuthSession(r.Log))
 	r.App.Delete("/api/auth/logout", middleware.NewAuthSession(r.Log), r.AuthController.Logout)
+
+	apiNotes := r.App.Group("/api/notes", middleware.NewAuthSession(r.Log))
+	apiNotes.Get("/", r.noteController.ListNotes)
+	apiNotes.Post("/", r.noteController.CreateNote)
+	apiNotes.Delete("/:noteId", r.noteController.DeleteNote)
 }
