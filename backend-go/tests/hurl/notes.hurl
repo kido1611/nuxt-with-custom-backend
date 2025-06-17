@@ -2,6 +2,7 @@
 # Create Session
 # ----------------------------------------
 GET http://localhost:8000/sanctum/csrf-cookie
+Origin: http://localhost:3000/
 
 HTTP 204
 [Captures]
@@ -12,6 +13,7 @@ temp-csrf-header: header "X-XSRF-TOKEN"
 # Register with data with csrf
 # ----------------------------------------
 POST http://localhost:8000/api/auth/register
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
 [Cookies]
 app_session: {{temp-app-session}}
@@ -34,6 +36,7 @@ email: jsonpath "$['data']['email']"
 # Create Session
 # ----------------------------------------
 GET http://localhost:8000/sanctum/csrf-cookie
+Origin: http://localhost:3000/
 
 HTTP 204
 [Captures]
@@ -44,6 +47,7 @@ temp-csrf-header: header "X-XSRF-TOKEN"
 # Login with correct data
 # ----------------------------------------
 POST http://localhost:8000/api/auth/login
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
 [Cookies]
 app_session: {{temp-app-session}}
@@ -66,6 +70,7 @@ csrf-header: header "X-XSRF-TOKEN"
 # Get user notes
 # ----------------------------------------
 GET http://localhost:8000/api/notes
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
 [Cookies]
 app_session: {{app-session}}
@@ -79,6 +84,7 @@ jsonpath "$.data" count == 0
 # Create note
 # ----------------------------------------
 POST http://localhost:8000/api/notes
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
 [Cookies]
 app_session: {{app-session}}
@@ -97,6 +103,7 @@ noteId : jsonpath "$.data.id"
 # Get user notes
 # ----------------------------------------
 GET http://localhost:8000/api/notes
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
 [Cookies]
 app_session: {{app-session}}
@@ -110,6 +117,7 @@ jsonpath "$.data" count == 1
 # Delete user notes
 # ----------------------------------------
 DELETE http://localhost:8000/api/notes/{{noteId}}
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
 [Cookies]
 app_session: {{app-session}}
@@ -120,6 +128,7 @@ HTTP 204
 # Get user notes
 # ----------------------------------------
 GET http://localhost:8000/api/notes
+Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
 [Cookies]
 app_session: {{app-session}}

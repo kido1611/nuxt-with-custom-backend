@@ -1,6 +1,7 @@
 {
   "app": {
-    "port": 8000
+    "port": 8000,
+    "allowed_ui": ["localhost:3000"]
   },
   "database": {
     "driver": "sqlite",

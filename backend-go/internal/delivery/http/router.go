@@ -64,6 +64,7 @@ func NewRouter(
 }
 
 func (r *Router) Setup() {
+	r.App.Use(middleware.NewVerifyOrigin(r.viper))
 	r.App.Use(middleware.NewSession(r.Log, r.SessionUsecase))
 	r.App.Use(middleware.NewCsrfMiddleware())
 	r.App.Get("/health", r.HomeController.Index)
