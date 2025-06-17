@@ -8,17 +8,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type AuthController struct {
 	Log            *logrus.Logger
+	viper          *viper.Viper
 	UserUseCase    *usecase.UserUseCase
 	SessionManager localSession.SessionManager
 }
 
-func NewAuthController(log *logrus.Logger, userUseCase *usecase.UserUseCase, sessionManager localSession.SessionManager) *AuthController {
+func NewAuthController(log *logrus.Logger, viper *viper.Viper, userUseCase *usecase.UserUseCase, sessionManager localSession.SessionManager) *AuthController {
 	return &AuthController{
 		Log:            log,
+		viper:          viper,
 		UserUseCase:    userUseCase,
 		SessionManager: sessionManager,
 	}
@@ -52,7 +55,7 @@ func (c *AuthController) Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	sessionCookie := createCookie(session.ID, session.ExpiredAt)
+	sessionCookie := createCookie(c.viper, session.ID, session.ExpiredAt)
 
 	ctx.Cookie(sessionCookie)
 
@@ -101,7 +104,7 @@ func (c *AuthController) CsrfToken(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	sessionCookie := createCookie(session.ID, session.ExpiredAt)
+	sessionCookie := createCookie(c.viper, session.ID, session.ExpiredAt)
 
 	ctx.Cookie(sessionCookie)
 
@@ -126,7 +129,7 @@ func (c *AuthController) Logout(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(204)
 }
 
-func createCookie(value string, expires time.Time) *fiber.Cookie {
+func createCookie(viper *viper.Viper, value string, expires time.Time) *fiber.Cookie {
 	cookie := new(fiber.Cookie)
 	cookie.Name = "app_session"
 	cookie.Value = value
@@ -134,8 +137,8 @@ func createCookie(value string, expires time.Time) *fiber.Cookie {
 	cookie.HTTPOnly = true
 	cookie.SameSite = fiber.CookieSameSiteLaxMode
 	cookie.Path = "/"
-	cookie.Secure = false            // TODO: add option to change to true in production
-	cookie.Domain = "localhost:3000" // TODO: add option to change domain
+	cookie.Secure = viper.GetBool("session.secure")
+	cookie.Domain = viper.GetString("session.domain")
 
 	return cookie
 }

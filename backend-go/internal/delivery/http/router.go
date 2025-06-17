@@ -11,12 +11,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type Router struct {
 	App            *fiber.App
 	Validate       *validator.Validate
 	Log            *logrus.Logger
+	viper          *viper.Viper
 	SessionManager session.SessionManager
 	SessionUsecase *usecase.SessionUseCase
 	HomeController *controller.HomeController
@@ -29,20 +31,21 @@ func NewRouter(
 	DB *sql.DB,
 	app *fiber.App,
 	validate *validator.Validate,
+	viper *viper.Viper,
 	log *logrus.Logger,
 ) *Router {
 	userRepository := repository.NewUserRepository()
 	sessionRepository := repository.NewSessionRepository()
 	noteRepository := repository.NewNoteRepository()
 
-	sessionManager := session.NewDbSessionManager(DB, log, sessionRepository)
+	sessionManager := session.NewDbSessionManager(DB, log, viper, sessionRepository)
 
 	userUseCase := usecase.NewUserUseCase(DB, validate, log, userRepository)
 	sessionUseCase := usecase.NewSessionUseCase(DB, log, sessionManager, userRepository)
 	noteUsecase := usecase.NewNoteUsecase(DB, log, validate, noteRepository)
 
 	homeController := controller.NewHomeController()
-	authController := controller.NewAuthController(log, userUseCase, sessionManager)
+	authController := controller.NewAuthController(log, viper, userUseCase, sessionManager)
 	userController := controller.NewUserController(log)
 	noteController := controller.NewNoteController(log, noteUsecase)
 
@@ -50,6 +53,7 @@ func NewRouter(
 		App:            app,
 		Validate:       validate,
 		Log:            log,
+		viper:          viper,
 		SessionManager: sessionManager,
 		SessionUsecase: sessionUseCase,
 		HomeController: homeController,

@@ -13,7 +13,7 @@ func main() {
 	db := config.NewDB(viper, log)
 	app := config.NewFiber()
 
-	router := http.NewRouter(db, app, validate, log)
+	router := http.NewRouter(db, app, validate, viper, log)
 	router.Setup()
 
 	err := app.Listen(fmt.Sprintf(":%d", viper.GetInt("app.port")))

@@ -13,18 +13,21 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 type DbSessionManager struct {
 	DB                *sql.DB
 	Log               *logrus.Logger
+	viper             *viper.Viper
 	SessionRepository repository.SessionRepository
 }
 
-func NewDbSessionManager(db *sql.DB, log *logrus.Logger, sessionRepository *repository.SessionRepository) *DbSessionManager {
+func NewDbSessionManager(db *sql.DB, log *logrus.Logger, viper *viper.Viper, sessionRepository *repository.SessionRepository) *DbSessionManager {
 	return &DbSessionManager{
 		DB:                db,
 		Log:               log,
+		viper:             viper,
 		SessionRepository: *sessionRepository,
 	}
 }
@@ -47,13 +50,15 @@ func (s *DbSessionManager) InsertSession(ctx context.Context, user *model.UserRe
 		}
 	}
 
+	lifespanDuration := s.viper.GetInt("session.lifetime")
+
 	data := sqlc.CreateSessionParams{
 		ID:        generateRandomToken(32),
 		UserID:    userId,
 		CsrfToken: generateRandomToken(32),
 		IpAddress: sql.NullString{},
 		UserAgent: sql.NullString{},
-		ExpiredAt: time.Now().Add(24 * time.Hour),
+		ExpiredAt: time.Now().Add(time.Duration(lifespanDuration) * time.Minute),
 		LastActivityAt: sql.NullTime{
 			Time:  time.Now(),
 			Valid: true,

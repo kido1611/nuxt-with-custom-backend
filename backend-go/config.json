@@ -8,5 +8,10 @@
   },
   "log": {
     "level": 6
+  },
+  "session": {
+    "domain": "localhost:8000",
+    "lifetime": 180,
+    "secure": false
   }
 }
