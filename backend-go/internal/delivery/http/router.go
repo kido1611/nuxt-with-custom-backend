@@ -45,7 +45,7 @@ func NewRouter(
 	noteUsecase := usecase.NewNoteUsecase(DB, log, validate, noteRepository)
 
 	homeController := controller.NewHomeController()
-	authController := controller.NewAuthController(log, viper, userUseCase, sessionManager)
+	authController := controller.NewAuthController(log, userUseCase, sessionManager)
 	userController := controller.NewUserController(log)
 	noteController := controller.NewNoteController(log, noteUsecase)
 
@@ -65,7 +65,7 @@ func NewRouter(
 
 func (r *Router) Setup() {
 	r.App.Use(middleware.NewVerifyOrigin(r.viper))
-	r.App.Use(middleware.NewSession(r.Log, r.SessionUsecase))
+	r.App.Use(middleware.NewSession(r.Log, r.viper, r.SessionUsecase))
 	r.App.Use(middleware.NewCsrfMiddleware())
 	r.App.Get("/health", r.HomeController.Index)
 	r.App.Get("/sanctum/csrf-cookie", r.AuthController.CsrfToken)

@@ -14,6 +14,12 @@ SET
   last_activity_at = now()
 WHERE id = ?;
 
+-- name: UpdateSessionExpired :exec
+UPDATE sessions
+SET 
+  expired_at = ?
+WHERE id = ?;
+
 -- name: DeleteSession :exec
 DELETE FROM sessions
 WHERE id = ?;

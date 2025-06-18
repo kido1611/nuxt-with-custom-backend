@@ -103,3 +103,34 @@ func (s *DbSessionManager) DeleteSession(ctx context.Context, id string) error {
 
 	return err
 }
+
+func (s *DbSessionManager) UpdateExpired(ctx context.Context, sessionResponse *model.SessionResponse) (*model.SessionResponse, error) {
+	if sessionResponse == nil {
+		return nil, nil
+	}
+
+	if time.Until(sessionResponse.ExpiredAt) > 30*time.Minute {
+		return nil, nil
+	}
+
+	// update expired_at
+	lifetimeDuration := s.viper.GetInt("session.lifetime")
+	expiredTime := time.Now().Add(time.Duration(lifetimeDuration) * time.Minute)
+
+	_, err := helper.DbTransaction(s.DB, s.Log, func(query *sqlc.Queries) (*sqlc.Session, error) {
+		err := query.UpdateSessionExpired(ctx, sqlc.UpdateSessionExpiredParams{
+			ExpiredAt: expiredTime,
+			ID:        sessionResponse.ID,
+		})
+		return nil, err
+	})
+	if err != nil {
+		// do nothing. let the session expired
+		return nil, nil
+	}
+
+	sessionResponse.ExpiredAt = expiredTime
+
+	// return back sessionResponse to update cookie
+	return sessionResponse, nil
+}

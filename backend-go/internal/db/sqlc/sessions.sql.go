@@ -85,6 +85,23 @@ func (q *Queries) GetSessionById(ctx context.Context, id string) (Session, error
 	return i, err
 }
 
+const updateSessionExpired = `-- name: UpdateSessionExpired :exec
+UPDATE sessions
+SET 
+  expired_at = ?
+WHERE id = ?
+`
+
+type UpdateSessionExpiredParams struct {
+	ExpiredAt time.Time
+	ID        string
+}
+
+func (q *Queries) UpdateSessionExpired(ctx context.Context, arg UpdateSessionExpiredParams) error {
+	_, err := q.db.ExecContext(ctx, updateSessionExpired, arg.ExpiredAt, arg.ID)
+	return err
+}
+
 const updateSessionLastActivity = `-- name: UpdateSessionLastActivity :exec
 UPDATE sessions
 SET 

@@ -4,24 +4,20 @@ import (
 	localSession "kido1611/notes-backend-go/internal/delivery/http/session"
 	"kido1611/notes-backend-go/internal/model"
 	"kido1611/notes-backend-go/internal/usecase"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 type AuthController struct {
 	Log            *logrus.Logger
-	viper          *viper.Viper
 	UserUseCase    *usecase.UserUseCase
 	SessionManager localSession.SessionManager
 }
 
-func NewAuthController(log *logrus.Logger, viper *viper.Viper, userUseCase *usecase.UserUseCase, sessionManager localSession.SessionManager) *AuthController {
+func NewAuthController(log *logrus.Logger, userUseCase *usecase.UserUseCase, sessionManager localSession.SessionManager) *AuthController {
 	return &AuthController{
 		Log:            log,
-		viper:          viper,
 		UserUseCase:    userUseCase,
 		SessionManager: sessionManager,
 	}
@@ -55,10 +51,6 @@ func (c *AuthController) Login(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	sessionCookie := createCookie(c.viper, session.ID, session.ExpiredAt)
-
-	ctx.Cookie(sessionCookie)
-
 	// set locals to add csrf token
 	ctx.Locals("session", session)
 
@@ -85,6 +77,7 @@ func (c *AuthController) Register(ctx *fiber.Ctx) error {
 	sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
 	if okSession && sessionResponse != nil {
 		c.SessionManager.DeleteSession(ctx.UserContext(), sessionResponse.ID)
+		ctx.Locals("session", nil)
 	}
 
 	return ctx.Status(fiber.StatusCreated).JSON(model.WebResponse[*model.UserResponse]{
@@ -104,10 +97,6 @@ func (c *AuthController) CsrfToken(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	sessionCookie := createCookie(c.viper, session.ID, session.ExpiredAt)
-
-	ctx.Cookie(sessionCookie)
-
 	// set locals to add csrf token
 	ctx.Locals("session", session)
 
@@ -126,19 +115,6 @@ func (c *AuthController) Logout(ctx *fiber.Ctx) error {
 		return err
 	}
 
+	ctx.ClearCookie("app_session")
 	return ctx.SendStatus(204)
-}
-
-func createCookie(viper *viper.Viper, value string, expires time.Time) *fiber.Cookie {
-	cookie := new(fiber.Cookie)
-	cookie.Name = "app_session"
-	cookie.Value = value
-	cookie.Expires = expires
-	cookie.HTTPOnly = true
-	cookie.SameSite = fiber.CookieSameSiteLaxMode
-	cookie.Path = "/"
-	cookie.Secure = viper.GetBool("session.secure")
-	cookie.Domain = viper.GetString("session.domain")
-
-	return cookie
 }

@@ -26,7 +26,7 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-header "X-XSRF-TOKEN" exists
+header "X-XSRF-TOKEN" not exists
 cookie "app_session" not exists
 [Captures]
 name: jsonpath "$['data']['name']"

@@ -62,3 +62,7 @@ func (u *SessionUseCase) ValidateSession(ctx context.Context, sessionId string) 
 	userResponse := converter.UserToResponse(user)
 	return sessionResponse, userResponse, nil
 }
+
+func (u *SessionUseCase) UpdateSessionExpired(ctx context.Context, sessionResponse *model.SessionResponse) (*model.SessionResponse, error) {
+	return u.SessionManager.UpdateExpired(ctx, sessionResponse)
+}

@@ -30,6 +30,8 @@ GET http://localhost:8000/sanctum/csrf-cookie
 Origin: http://localhost:3000/
 
 HTTP 204
+[Asserts]
+cookie "app_session" exists
 [Captures]
 temp-app-session: cookie "app_session"
 temp-csrf-header: header "X-XSRF-TOKEN"
@@ -64,7 +66,7 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-header "X-XSRF-TOKEN" exists
+header "X-XSRF-TOKEN" not exists
 cookie "app_session" not exists
 [Captures]
 name: jsonpath "$['data']['name']"
@@ -105,6 +107,8 @@ GET http://localhost:8000/sanctum/csrf-cookie
 Origin: http://localhost:3000/
 
 HTTP 204
+[Asserts]
+cookie "app_session" exists
 [Captures]
 temp-app-session: cookie "app_session"
 temp-csrf-header: header "X-XSRF-TOKEN"
@@ -171,6 +175,7 @@ HTTP 200
 [Asserts]
 header "X-XSRF-TOKEN" exists
 header "X-XSRF-TOKEN" == {{csrf-header}}
+cookie "app_session" not exists
 jsonpath "$.data.name" == {{name}}
 jsonpath "$.data.email" == {{email}}
 
@@ -192,6 +197,7 @@ HTTP 403
 header "X-XSRF-TOKEN" exists
 header "X-XSRF-TOKEN" == {{csrf-header}}
 header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "app_session" not exists
 
 # ----------------------------------------
 # Login with current active session (cookie) with old CSRF token
@@ -227,6 +233,7 @@ HTTP 403
 header "X-XSRF-TOKEN" exists
 header "X-XSRF-TOKEN" == "{{csrf-header}}"
 header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "app_session" not exists
 
 # ----------------------------------------
 # Register with current active session (cookie) with old CSRF token
@@ -271,6 +278,9 @@ X-XSRF-TOKEN: {{csrf-header}}
 app_session: {{app-session}}
 
 HTTP 204
+[Asserts]
+cookie "app_session" exists
+cookie "app_session[Value]" == ""
 
 # ----------------------------------------
 # Get user with session (cookie)
@@ -279,7 +289,5 @@ GET http://localhost:8000/api/user
 Origin: http://localhost:3000/
 [Cookies]
 app_session: "{{app-session}}"
-[Options]
-very-verbose: true
 
 HTTP 401
