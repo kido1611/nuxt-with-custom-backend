@@ -59,10 +59,6 @@ func (s *DbSessionManager) InsertSession(ctx context.Context, user *model.UserRe
 		IpAddress: sql.NullString{},
 		UserAgent: sql.NullString{},
 		ExpiredAt: time.Now().Add(time.Duration(lifespanDuration) * time.Minute),
-		LastActivityAt: sql.NullTime{
-			Time:  time.Now(),
-			Valid: true,
-		},
 	}
 
 	result, err := helper.DbTransaction(s.DB, s.Log, func(query *sqlc.Queries) (*sqlc.Session, error) {

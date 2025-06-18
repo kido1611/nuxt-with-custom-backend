@@ -12,19 +12,18 @@ import (
 )
 
 const createSession = `-- name: CreateSession :one
-INSERT INTO sessions (id, user_id, csrf_token, ip_address, user_agent, expired_at, last_activity_at)
-VALUES (?, ?, ?, ?, ?, ?, ?)
-RETURNING id, user_id, csrf_token, ip_address, user_agent, expired_at, last_activity_at, created_at, updated_at
+INSERT INTO sessions (id, user_id, csrf_token, ip_address, user_agent, expired_at)
+VALUES (?, ?, ?, ?, ?, ?)
+RETURNING id, user_id, csrf_token, ip_address, user_agent, expired_at, created_at, updated_at
 `
 
 type CreateSessionParams struct {
-	ID             string
-	UserID         sql.NullString
-	CsrfToken      string
-	IpAddress      sql.NullString
-	UserAgent      sql.NullString
-	ExpiredAt      time.Time
-	LastActivityAt sql.NullTime
+	ID        string
+	UserID    sql.NullString
+	CsrfToken string
+	IpAddress sql.NullString
+	UserAgent sql.NullString
+	ExpiredAt time.Time
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error) {
@@ -35,7 +34,6 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 		arg.IpAddress,
 		arg.UserAgent,
 		arg.ExpiredAt,
-		arg.LastActivityAt,
 	)
 	var i Session
 	err := row.Scan(
@@ -45,7 +43,6 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (S
 		&i.IpAddress,
 		&i.UserAgent,
 		&i.ExpiredAt,
-		&i.LastActivityAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -63,7 +60,7 @@ func (q *Queries) DeleteSession(ctx context.Context, id string) error {
 }
 
 const getSessionById = `-- name: GetSessionById :one
-SELECT id, user_id, csrf_token, ip_address, user_agent, expired_at, last_activity_at, created_at, updated_at FROM sessions
+SELECT id, user_id, csrf_token, ip_address, user_agent, expired_at, created_at, updated_at FROM sessions
 WHERE id = ?
 LIMIT 1
 `
@@ -78,7 +75,6 @@ func (q *Queries) GetSessionById(ctx context.Context, id string) (Session, error
 		&i.IpAddress,
 		&i.UserAgent,
 		&i.ExpiredAt,
-		&i.LastActivityAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -99,17 +95,5 @@ type UpdateSessionExpiredParams struct {
 
 func (q *Queries) UpdateSessionExpired(ctx context.Context, arg UpdateSessionExpiredParams) error {
 	_, err := q.db.ExecContext(ctx, updateSessionExpired, arg.ExpiredAt, arg.ID)
-	return err
-}
-
-const updateSessionLastActivity = `-- name: UpdateSessionLastActivity :exec
-UPDATE sessions
-SET 
-  last_activity_at = now()
-WHERE id = ?
-`
-
-func (q *Queries) UpdateSessionLastActivity(ctx context.Context, id string) error {
-	_, err := q.db.ExecContext(ctx, updateSessionLastActivity, id)
 	return err
 }

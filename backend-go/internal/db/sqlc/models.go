@@ -21,15 +21,14 @@ type Note struct {
 }
 
 type Session struct {
-	ID             string
-	UserID         sql.NullString
-	CsrfToken      string
-	IpAddress      sql.NullString
-	UserAgent      sql.NullString
-	ExpiredAt      time.Time
-	LastActivityAt sql.NullTime
-	CreatedAt      sql.NullTime
-	UpdatedAt      sql.NullTime
+	ID        string
+	UserID    sql.NullString
+	CsrfToken string
+	IpAddress sql.NullString
+	UserAgent sql.NullString
+	ExpiredAt time.Time
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
 }
 
 type User struct {

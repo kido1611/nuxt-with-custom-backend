@@ -5,11 +5,10 @@ import (
 )
 
 type SessionResponse struct {
-	ID             string
-	UserID         string
-	CsrfToken      string
-	IpAddress      string
-	UserAgent      string
-	ExpiredAt      time.Time
-	LastActivityAt time.Time
+	ID        string
+	UserID    string
+	CsrfToken string
+	IpAddress string
+	UserAgent string
+	ExpiredAt time.Time
 }
