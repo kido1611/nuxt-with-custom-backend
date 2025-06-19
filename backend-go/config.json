@@ -1,7 +1,6 @@
 {
   "app": {
-    "port": 8000,
-    "allowed_ui": ["localhost:3000"]
+    "port": 8000
   },
   "cors": {
     "origins": "http://localhost:3000, https://google.com",

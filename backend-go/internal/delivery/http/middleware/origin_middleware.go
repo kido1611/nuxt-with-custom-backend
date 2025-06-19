@@ -9,16 +9,14 @@ import (
 )
 
 func NewVerifyOrigin(viper *viper.Viper) fiber.Handler {
-	allowedDomains := viper.GetStringSlice("app.allowed_ui")
+	// use cors origins config
+	allowedOriginsString := viper.GetString("cors.origins")
+	allowedOrigins := strings.Split(allowedOriginsString, ", ")
 
 	return func(ctx *fiber.Ctx) error {
 		origin := ctx.Get("Origin", ctx.Get("Referer", ""))
 
-		origin = strings.ReplaceAll(origin, "https://", "")
-		origin = strings.ReplaceAll(origin, "http://", "")
-		origin = strings.TrimSuffix(origin, "/")
-
-		if !slices.Contains(allowedDomains, origin) {
+		if !slices.Contains(allowedOrigins, strings.TrimRight(origin, "/")) {
 			return fiber.ErrForbidden
 		}
 
