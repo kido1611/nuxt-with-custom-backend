@@ -14,8 +14,8 @@ func NewVerifyOrigin(viper *viper.Viper) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		origin := ctx.Get("Origin", ctx.Get("Referer", ""))
 
-		origin = strings.Replace(origin, "https://", "", -1)
-		origin = strings.Replace(origin, "http://", "", -1)
+		origin = strings.ReplaceAll(origin, "https://", "")
+		origin = strings.ReplaceAll(origin, "http://", "")
 		origin = strings.TrimSuffix(origin, "/")
 
 		if !slices.Contains(allowedDomains, origin) {
