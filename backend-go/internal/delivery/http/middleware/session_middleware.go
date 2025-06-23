@@ -12,12 +12,13 @@ import (
 
 func NewSession(log *logrus.Logger, viper *viper.Viper, sessionUseCase *usecase.SessionUseCase) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		sessionIdCookie := ctx.Cookies("app_session")
+		sessionIDCookie := ctx.Cookies("app_session")
 
-		if sessionIdCookie != "" {
-			sessionResponse, userResponse, err := sessionUseCase.ValidateSession(ctx.UserContext(), sessionIdCookie)
+		if sessionIDCookie != "" {
+			sessionResponse, userResponse, err := sessionUseCase.ValidateSession(ctx.UserContext(), sessionIDCookie)
 			if err != nil {
-				ctx.ClearCookie("app_session")
+				// Delete Cookie
+				ctx.Cookie(CreateCookie(viper, "app_session", "", time.Unix(0, 0), true))
 				log.Warnf("Failed when validate session: %+v", err)
 			} else {
 				ctx.Locals("session", sessionResponse)
@@ -29,25 +30,30 @@ func NewSession(log *logrus.Logger, viper *viper.Viper, sessionUseCase *usecase.
 
 		// update expired and set cookie session if not exist
 		sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
+
 		if !okSession || sessionResponse == nil {
+			if sessionIDCookie != "" {
+				// Delete Cookie
+				ctx.Cookie(CreateCookie(viper, "app_session", "", time.Unix(0, 0), true))
+			}
 			return err
 		}
 
 		// currently after access csrf-cookie
-		if sessionIdCookie == "" {
-			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt))
+		if sessionIDCookie == "" {
+			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt, true))
 			return err
 		}
 
 		// handle after login
-		if sessionIdCookie != sessionResponse.ID {
-			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt))
+		if sessionIDCookie != sessionResponse.ID {
+			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt, true))
 			return err
 		}
 
 		newSession, _ := sessionUseCase.UpdateSessionExpired(ctx.UserContext(), sessionResponse)
 		if newSession != nil {
-			ctx.Cookie(CreateCookie(viper, "app_session", newSession.ID, newSession.ExpiredAt))
+			ctx.Cookie(CreateCookie(viper, "app_session", newSession.ID, newSession.ExpiredAt, true))
 		}
 
 		return err
@@ -88,16 +94,20 @@ func NewAuthSession(log *logrus.Logger) fiber.Handler {
 	}
 }
 
-func CreateCookie(viper *viper.Viper, name string, value string, expires time.Time) *fiber.Cookie {
+func CreateCookie(viper *viper.Viper, name string, value string, expires time.Time, httpOnly bool) *fiber.Cookie {
 	cookie := new(fiber.Cookie)
 	cookie.Name = name
 	cookie.Value = value
 	cookie.Expires = expires
-	cookie.HTTPOnly = true
+	cookie.HTTPOnly = httpOnly
 	cookie.SameSite = fiber.CookieSameSiteLaxMode
 	cookie.Path = "/"
 	cookie.Secure = viper.GetBool("session.secure")
-	cookie.Domain = viper.GetString("session.domain")
+
+	sessionDomain := viper.GetString("session.domain")
+	if sessionDomain != "" {
+		cookie.Domain = sessionDomain
+	}
 
 	return cookie
 }

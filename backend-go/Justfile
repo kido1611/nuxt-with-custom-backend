@@ -72,7 +72,7 @@ migrate-fresh: check_tool_migrate && migrate-up
 [doc("Integration testing using Hurl")]
 test-hurl: check_tool_hurl
   @echo "Test using Hurl"
-  @hurl tests/hurl/ --no-output
+  @hurl tests/hurl/ --no-output -v
 
 [private]
 check_tool_hurl:

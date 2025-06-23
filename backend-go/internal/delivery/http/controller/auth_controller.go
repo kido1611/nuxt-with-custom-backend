@@ -114,7 +114,8 @@ func (c *AuthController) Logout(ctx *fiber.Ctx) error {
 		c.Log.Warnf("Failed deleting session: %+v", err)
 		return err
 	}
+	ctx.Locals("session", nil)
 
-	ctx.ClearCookie("app_session")
+	// ctx.ClearCookie("app_session")
 	return ctx.SendStatus(204)
 }

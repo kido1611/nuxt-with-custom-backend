@@ -34,7 +34,6 @@ HTTP 204
 cookie "app_session" exists
 cookie "XSRF-TOKEN" exists
 [Captures]
-temp-app-session: cookie "app_session"
 temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -43,8 +42,6 @@ temp-csrf-header: cookie "XSRF-TOKEN"
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 
 HTTP 400
 [Asserts]
@@ -56,8 +53,6 @@ cookie "XSRF-TOKEN" exists
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{newUuid}}@test.com",
   "name": "test name",
@@ -67,8 +62,10 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-cookie "XSRF-TOKEN" not exists
-cookie "app_session" not exists
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" == ""
+cookie "app_session" exists
+cookie "app_session" == ""
 [Captures]
 name: jsonpath "$['data']['name']"
 email: jsonpath "$['data']['email']"
@@ -79,8 +76,6 @@ email: jsonpath "$['data']['email']"
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{newUuid}}@test.com",
   "name": "test name",
@@ -90,8 +85,15 @@ app_session: {{temp-app-session}}
 HTTP 419
 [Asserts]
 cookie "XSRF-TOKEN" not exists
-cookie "app_session" exists
-cookie "app_session[Value]" == "" 
+cookie "app_session" not exists
+
+# ----------------------------------------
+# Get user with session (cookie)
+# ----------------------------------------
+GET http://localhost:8000/api/user
+Origin: http://localhost:3000/
+
+HTTP 401
 
 # ----------------------------------------
 # Login without data and without CSRF
@@ -112,7 +114,6 @@ HTTP 204
 cookie "app_session" exists
 cookie "XSRF-TOKEN" exists
 [Captures]
-temp-app-session: cookie "app_session"
 temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -121,8 +122,6 @@ temp-csrf-header: cookie "XSRF-TOKEN"
 POST http://localhost:8000/api/auth/login
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{email}}",
   "password": "incorrent-password"
@@ -138,8 +137,6 @@ cookie "XSRF-TOKEN" exists
 POST http://localhost:8000/api/auth/login
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{email}}",
   "password": "password"
@@ -149,10 +146,9 @@ HTTP 200
 [Asserts]
 cookie "XSRF-TOKEN" exists
 cookie "app_session" exists
-jsonpath "$.data.email" == {{email}}
 cookie "XSRF-TOKEN" != {{temp-csrf-header}}
+jsonpath "$.data.email" == {{email}}
 [Captures]
-app-session: cookie "app_session"
 csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -160,18 +156,6 @@ csrf-header: cookie "XSRF-TOKEN"
 # ----------------------------------------
 GET http://localhost:8000/api/user
 Origin: http://localhost:3000/
-
-HTTP 401
-[Asserts]
-cookie "XSRF-TOKEN" not exists
-
-# ----------------------------------------
-# Get user with session (cookie)
-# ----------------------------------------
-GET http://localhost:8000/api/user
-Origin: http://localhost:3000/
-[Cookies]
-app_session: "{{app-session}}"
 
 HTTP 200
 [Asserts]
@@ -187,8 +171,6 @@ jsonpath "$.data.email" == {{email}}
 POST http://localhost:8000/api/auth/login
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: "{{app-session}}"
 {
   "email": "{{email}}",
   "password": "password"
@@ -207,8 +189,6 @@ cookie "app_session" not exists
 POST http://localhost:8000/api/auth/login
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: "{{app-session}}"
 {
   "email": "{{email}}",
   "password": "password"
@@ -222,8 +202,6 @@ HTTP 419
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: "{{app-session}}"
 {
   "email": "{{newUuid}}@test.com",
   "name": "test name",
@@ -243,8 +221,6 @@ cookie "app_session" not exists
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: "{{app-session}}"
 {
   "email": "{{newUuid}}@test.com",
   "name": "test name",
@@ -254,19 +230,10 @@ app_session: "{{app-session}}"
 HTTP 419
 
 # ----------------------------------------
-# Logout without session and without CSRF Token
+# Logout without CSRF Token
 # ----------------------------------------
 DELETE http://localhost:8000/api/auth/logout
 Origin: http://localhost:3000/
-
-HTTP 419
-
-# ----------------------------------------
-# Logout without session
-# ----------------------------------------
-DELETE http://localhost:8000/api/auth/logout
-Origin: http://localhost:3000/
-X-XSRF-TOKEN: {{csrf-header}}
 
 HTTP 419
 
@@ -276,20 +243,18 @@ HTTP 419
 DELETE http://localhost:8000/api/auth/logout
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 
 HTTP 204
 [Asserts]
 cookie "app_session" exists
 cookie "app_session[Value]" == ""
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN[Value]" == ""
 
 # ----------------------------------------
 # Get user with session (cookie)
 # ----------------------------------------
 GET http://localhost:8000/api/user
 Origin: http://localhost:3000/
-[Cookies]
-app_session: "{{app-session}}"
 
 HTTP 401

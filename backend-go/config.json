@@ -16,7 +16,7 @@
     "level": 6
   },
   "session": {
-    "domain": "localhost:8000",
+    "domain": "localhost",
     "lifetime": 180,
     "secure": false
   }

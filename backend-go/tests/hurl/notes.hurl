@@ -6,7 +6,6 @@ Origin: http://localhost:3000/
 
 HTTP 204
 [Captures]
-temp-app-session: cookie "app_session"
 temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -15,8 +14,6 @@ temp-csrf-header: cookie "XSRF-TOKEN"
 POST http://localhost:8000/api/auth/register
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{newUuid}}@test.com",
   "name": "test name",
@@ -26,8 +23,10 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-cookie "XSRF-TOKEN" not exists
-cookie "app_session" not exists
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" == ""
+cookie "app_session" exists
+cookie "app_session" == ""
 [Captures]
 name: jsonpath "$['data']['name']"
 email: jsonpath "$['data']['email']"
@@ -40,7 +39,6 @@ Origin: http://localhost:3000/
 
 HTTP 204
 [Captures]
-temp-app-session: cookie "app_session"
 temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -49,8 +47,6 @@ temp-csrf-header: cookie "XSRF-TOKEN"
 POST http://localhost:8000/api/auth/login
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{temp-csrf-header}}
-[Cookies]
-app_session: {{temp-app-session}}
 {
   "email": "{{email}}",
   "password": "password"
@@ -63,7 +59,6 @@ cookie "app_session" exists
 jsonpath "$.data.email" == {{email}}
 cookie "XSRF-TOKEN" != {{temp-csrf-header}}
 [Captures]
-app-session: cookie "app_session"
 csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
@@ -72,8 +67,6 @@ csrf-header: cookie "XSRF-TOKEN"
 GET http://localhost:8000/api/notes
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 
 HTTP 200
 [Asserts]
@@ -86,8 +79,6 @@ jsonpath "$.data" count == 0
 POST http://localhost:8000/api/notes
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 {
   "title": "Title {{newUuid}}",
   "description": "Description {{newUuid}}"
@@ -105,8 +96,6 @@ noteId : jsonpath "$.data.id"
 GET http://localhost:8000/api/notes
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 
 HTTP 200
 [Asserts]
@@ -119,8 +108,6 @@ jsonpath "$.data" count == 1
 DELETE http://localhost:8000/api/notes/{{noteId}}
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 
 HTTP 204
 
@@ -130,8 +117,6 @@ HTTP 204
 GET http://localhost:8000/api/notes
 Origin: http://localhost:3000/
 X-XSRF-TOKEN: {{csrf-header}}
-[Cookies]
-app_session: {{app-session}}
 
 HTTP 200
 [Asserts]

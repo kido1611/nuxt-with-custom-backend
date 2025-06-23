@@ -15,13 +15,14 @@ func NewCsrfMiddleware(viper *viper.Viper) fiber.Handler {
 
 		notSafeMethods := []string{"POST", "PUT", "PATCH", "DELETE"}
 
+		sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
+
 		if slices.Contains(notSafeMethods, method) {
 			requestCsrfToken := ctx.Get("X-XSRF-TOKEN", "")
 			if requestCsrfToken == "" {
 				return fiber.NewError(419, "CSRF Token Missmatch")
 			}
 
-			sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
 			if !okSession {
 				return fiber.NewError(419, "CSRF Token Missmatch")
 			}
@@ -38,11 +39,21 @@ func NewCsrfMiddleware(viper *viper.Viper) fiber.Handler {
 		err := ctx.Next()
 
 		// add csrf heaader
-		sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
-		if okSession && sessionResponse != nil {
-			// ctx.Set("X-XSRF-TOKEN", sessionResponse.CsrfToken)
+		sessionNewResponse, okNewSession := ctx.Locals("session").(*model.SessionResponse)
+		if !okNewSession {
+			if sessionResponse != nil {
+				// Delete Cookie
+				ctx.Cookie(CreateCookie(viper, "XSRF-TOKEN", "", time.Unix(0, 0), false))
+			}
 
-			ctx.Cookie(CreateCookie(viper, "XSRF-TOKEN", sessionResponse.CsrfToken, sessionResponse.ExpiredAt.Add(60*time.Hour)))
+			return err
+		}
+
+		if sessionNewResponse != nil {
+			ctx.Cookie(CreateCookie(viper, "XSRF-TOKEN", sessionNewResponse.CsrfToken, sessionNewResponse.ExpiredAt, false))
+		} else {
+			// Delete Cookie
+			ctx.Cookie(CreateCookie(viper, "XSRF-TOKEN", "", time.Unix(0, 0), false))
 		}
 
 		return err
