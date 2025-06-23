@@ -1,0 +1,23 @@
+{
+  "app": {
+    "port": 8000
+  },
+  "cors": {
+    "origins": "http://localhost:3000, https://google.com",
+    "methods": "GET, POST, DELETE, OPTIONS",
+    "allow_credentials": true,
+    "headers": "Content-Type"
+  },
+  "database": {
+    "driver": "sqlite",
+    "host": "db.sqlite"
+  },
+  "log": {
+    "level": 6
+  },
+  "session": {
+    "domain": "localhost:8000",
+    "lifetime": 180,
+    "secure": false
+  }
+}
