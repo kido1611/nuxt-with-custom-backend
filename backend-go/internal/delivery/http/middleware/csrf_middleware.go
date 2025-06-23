@@ -3,11 +3,13 @@ package middleware
 import (
 	"kido1611/notes-backend-go/internal/model"
 	"slices"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
 )
 
-func NewCsrfMiddleware() fiber.Handler {
+func NewCsrfMiddleware(viper *viper.Viper) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		method := string(ctx.Request().Header.Method())
 
@@ -38,7 +40,9 @@ func NewCsrfMiddleware() fiber.Handler {
 		// add csrf heaader
 		sessionResponse, okSession := ctx.Locals("session").(*model.SessionResponse)
 		if okSession && sessionResponse != nil {
-			ctx.Set("X-XSRF-TOKEN", sessionResponse.CsrfToken)
+			// ctx.Set("X-XSRF-TOKEN", sessionResponse.CsrfToken)
+
+			ctx.Cookie(CreateCookie(viper, "XSRF-TOKEN", sessionResponse.CsrfToken, sessionResponse.ExpiredAt.Add(60*time.Hour)))
 		}
 
 		return err

@@ -7,7 +7,7 @@ Origin: http://localhost:3000/
 HTTP 204
 [Captures]
 temp-app-session: cookie "app_session"
-temp-csrf-header: header "X-XSRF-TOKEN"
+temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Register with data with csrf
@@ -26,7 +26,7 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-header "X-XSRF-TOKEN" not exists
+cookie "XSRF-TOKEN" not exists
 cookie "app_session" not exists
 [Captures]
 name: jsonpath "$['data']['name']"
@@ -41,7 +41,7 @@ Origin: http://localhost:3000/
 HTTP 204
 [Captures]
 temp-app-session: cookie "app_session"
-temp-csrf-header: header "X-XSRF-TOKEN"
+temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Login with correct data
@@ -58,13 +58,13 @@ app_session: {{temp-app-session}}
 
 HTTP 200
 [Asserts]
-header "X-XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" exists
 cookie "app_session" exists
 jsonpath "$.data.email" == {{email}}
-header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "XSRF-TOKEN" != {{temp-csrf-header}}
 [Captures]
 app-session: cookie "app_session"
-csrf-header: header "X-XSRF-TOKEN"
+csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Get user notes

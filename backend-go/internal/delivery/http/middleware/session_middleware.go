@@ -35,19 +35,19 @@ func NewSession(log *logrus.Logger, viper *viper.Viper, sessionUseCase *usecase.
 
 		// currently after access csrf-cookie
 		if sessionIdCookie == "" {
-			ctx.Cookie(createCookie(viper, sessionResponse.ID, sessionResponse.ExpiredAt))
+			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt))
 			return err
 		}
 
 		// handle after login
 		if sessionIdCookie != sessionResponse.ID {
-			ctx.Cookie(createCookie(viper, sessionResponse.ID, sessionResponse.ExpiredAt))
+			ctx.Cookie(CreateCookie(viper, "app_session", sessionResponse.ID, sessionResponse.ExpiredAt))
 			return err
 		}
 
 		newSession, _ := sessionUseCase.UpdateSessionExpired(ctx.UserContext(), sessionResponse)
 		if newSession != nil {
-			ctx.Cookie(createCookie(viper, newSession.ID, newSession.ExpiredAt))
+			ctx.Cookie(CreateCookie(viper, "app_session", newSession.ID, newSession.ExpiredAt))
 		}
 
 		return err
@@ -88,9 +88,9 @@ func NewAuthSession(log *logrus.Logger) fiber.Handler {
 	}
 }
 
-func createCookie(viper *viper.Viper, value string, expires time.Time) *fiber.Cookie {
+func CreateCookie(viper *viper.Viper, name string, value string, expires time.Time) *fiber.Cookie {
 	cookie := new(fiber.Cookie)
-	cookie.Name = "app_session"
+	cookie.Name = name
 	cookie.Value = value
 	cookie.Expires = expires
 	cookie.HTTPOnly = true

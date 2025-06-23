@@ -6,7 +6,7 @@ Origin: http://localhost:3000/
 
 HTTP 200 
 [Asserts]
-header "X-XSRF-TOKEN" not exists
+cookie "X-XSRF-TOKEN" not exists
 
 # ----------------------------------------
 # Register with data without CSRF
@@ -21,7 +21,7 @@ Origin: http://localhost:3000/
 
 HTTP 419
 [Asserts]
-header "X-XSRF-TOKEN" not exists
+cookie "X-XSRF-TOKEN" not exists
 
 # ----------------------------------------
 # Create Session
@@ -32,9 +32,10 @@ Origin: http://localhost:3000/
 HTTP 204
 [Asserts]
 cookie "app_session" exists
+cookie "XSRF-TOKEN" exists
 [Captures]
 temp-app-session: cookie "app_session"
-temp-csrf-header: header "X-XSRF-TOKEN"
+temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Register without data with CSRF
@@ -47,7 +48,7 @@ app_session: {{temp-app-session}}
 
 HTTP 400
 [Asserts]
-header "X-XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" exists
 
 # ----------------------------------------
 # Register with data with csrf
@@ -66,7 +67,7 @@ app_session: {{temp-app-session}}
 HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
-header "X-XSRF-TOKEN" not exists
+cookie "XSRF-TOKEN" not exists
 cookie "app_session" not exists
 [Captures]
 name: jsonpath "$['data']['name']"
@@ -88,7 +89,7 @@ app_session: {{temp-app-session}}
 
 HTTP 419
 [Asserts]
-header "X-XSRF-TOKEN" not exists
+cookie "XSRF-TOKEN" not exists
 cookie "app_session" exists
 cookie "app_session[Value]" == "" 
 
@@ -109,9 +110,10 @@ Origin: http://localhost:3000/
 HTTP 204
 [Asserts]
 cookie "app_session" exists
+cookie "XSRF-TOKEN" exists
 [Captures]
 temp-app-session: cookie "app_session"
-temp-csrf-header: header "X-XSRF-TOKEN"
+temp-csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Login with incorrect data
@@ -128,7 +130,7 @@ app_session: {{temp-app-session}}
 
 HTTP 401
 [Asserts]
-header "X-XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" exists
 
 # ----------------------------------------
 # Login with correct data
@@ -145,13 +147,13 @@ app_session: {{temp-app-session}}
 
 HTTP 200
 [Asserts]
-header "X-XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" exists
 cookie "app_session" exists
 jsonpath "$.data.email" == {{email}}
-header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "XSRF-TOKEN" != {{temp-csrf-header}}
 [Captures]
 app-session: cookie "app_session"
-csrf-header: header "X-XSRF-TOKEN"
+csrf-header: cookie "XSRF-TOKEN"
 
 # ----------------------------------------
 # Get user without session 
@@ -161,7 +163,7 @@ Origin: http://localhost:3000/
 
 HTTP 401
 [Asserts]
-header "X-XSRF-TOKEN" not exists
+cookie "XSRF-TOKEN" not exists
 
 # ----------------------------------------
 # Get user with session (cookie)
@@ -173,8 +175,8 @@ app_session: "{{app-session}}"
 
 HTTP 200
 [Asserts]
-header "X-XSRF-TOKEN" exists
-header "X-XSRF-TOKEN" == {{csrf-header}}
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" == {{csrf-header}}
 cookie "app_session" not exists
 jsonpath "$.data.name" == {{name}}
 jsonpath "$.data.email" == {{email}}
@@ -194,9 +196,9 @@ app_session: "{{app-session}}"
 
 HTTP 403
 [Asserts]
-header "X-XSRF-TOKEN" exists
-header "X-XSRF-TOKEN" == {{csrf-header}}
-header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" == {{csrf-header}}
+cookie "XSRF-TOKEN" != {{temp-csrf-header}}
 cookie "app_session" not exists
 
 # ----------------------------------------
@@ -230,9 +232,9 @@ app_session: "{{app-session}}"
 
 HTTP 403
 [Asserts]
-header "X-XSRF-TOKEN" exists
-header "X-XSRF-TOKEN" == "{{csrf-header}}"
-header "X-XSRF-TOKEN" != {{temp-csrf-header}}
+cookie "XSRF-TOKEN" exists
+cookie "XSRF-TOKEN" == "{{csrf-header}}"
+cookie "XSRF-TOKEN" != {{temp-csrf-header}}
 cookie "app_session" not exists
 
 # ----------------------------------------
