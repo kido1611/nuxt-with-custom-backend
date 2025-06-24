@@ -3,7 +3,6 @@
 package middleware
 
 import (
-	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -53,8 +52,6 @@ func isPreflightRequest(ctx *fiber.Ctx) bool {
 	method := ctx.Method()
 	accessControlRequestMethod := ctx.Get(fiber.HeaderAccessControlRequestMethod)
 
-	fmt.Println(method, accessControlRequestMethod, method == "OPTIONS" && accessControlRequestMethod != "")
-
 	return method == "OPTIONS" && accessControlRequestMethod != ""
 }
 
@@ -65,6 +62,8 @@ func originHeader(ctx *fiber.Ctx, allowedOrigins []string) bool {
 	if origin == "" {
 		return false
 	}
+
+	origin = GetOriginFromURL(origin)
 
 	if !slices.Contains(allowedOrigins, strings.TrimRight(origin, "/")) {
 		return false

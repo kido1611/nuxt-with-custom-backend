@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/url"
 	"slices"
 	"strings"
 
@@ -15,6 +16,7 @@ func NewVerifyOrigin(viper *viper.Viper) fiber.Handler {
 
 	return func(ctx *fiber.Ctx) error {
 		origin := ctx.Get("Origin", ctx.Get("Referer", ""))
+		origin = GetOriginFromURL(origin)
 
 		if !slices.Contains(allowedOrigins, strings.TrimRight(origin, "/")) {
 			return fiber.ErrForbidden
@@ -22,4 +24,13 @@ func NewVerifyOrigin(viper *viper.Viper) fiber.Handler {
 
 		return ctx.Next()
 	}
+}
+
+func GetOriginFromURL(origin string) string {
+	originURL, err := url.Parse(origin)
+	if err != nil {
+		return ""
+	}
+
+	return originURL.Scheme + "://" + originURL.Host
 }
