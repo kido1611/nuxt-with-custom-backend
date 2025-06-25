@@ -24,9 +24,9 @@ HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
 cookie "XSRF-TOKEN" exists
-cookie "XSRF-TOKEN" == ""
+cookie "XSRF-TOKEN" == "\"\""
 cookie "app_session" exists
-cookie "app_session" == ""
+cookie "app_session" == "\"\""
 [Captures]
 name: jsonpath "$['data']['name']"
 email: jsonpath "$['data']['email']"

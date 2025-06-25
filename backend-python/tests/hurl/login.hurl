@@ -64,9 +64,9 @@ HTTP 201
 [Asserts]
 jsonpath "$.data.email" exists
 cookie "XSRF-TOKEN" exists
-cookie "XSRF-TOKEN" == ""
+cookie "XSRF-TOKEN[Value]" == "\"\""
 cookie "app_session" exists
-cookie "app_session" == ""
+cookie "app_session[Value]" == "\"\""
 [Captures]
 name: jsonpath "$['data']['name']"
 email: jsonpath "$['data']['email']"
@@ -248,9 +248,9 @@ X-XSRF-TOKEN: {{csrf-header}}
 HTTP 204
 [Asserts]
 cookie "app_session" exists
-cookie "app_session[Value]" == ""
+cookie "app_session[Value]" == "\"\""
 cookie "XSRF-TOKEN" exists
-cookie "XSRF-TOKEN[Value]" == ""
+cookie "XSRF-TOKEN[Value]" == "\"\""
 
 # ----------------------------------------
 # Get user with session (cookie)

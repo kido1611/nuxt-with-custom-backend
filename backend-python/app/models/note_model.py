@@ -1,15 +1,9 @@
-from pydantic import BaseModel, Field
 from sqlmodel import Relationship, SQLModel, Field as SQLField
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from .user_model import UserEntity
-
-
-class NoteRequest(BaseModel):
-    title: str = Field(max_length=200)
-    description: str | None = Field(max_length=2000)
 
 
 class NoteEntity(SQLModel, table=True):

@@ -10,7 +10,9 @@ class SessionEntity(SQLModel, table=True):
     __tablename__ = "sessions"  # type: ignore
 
     id: str = SQLField(primary_key=True)
-    user_id: str = SQLField(foreign_key="users.id", ondelete="CASCADE")
+    user_id: str | None = SQLField(
+        foreign_key="users.id", ondelete="CASCADE", nullable=True
+    )
     csrf_token: str
     ip_address: str | None
     user_agent: str | None

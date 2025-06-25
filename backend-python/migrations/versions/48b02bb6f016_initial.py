@@ -1,20 +1,20 @@
 """initial
 
-Revision ID: 2a225491dfc6
+Revision ID: 48b02bb6f016
 Revises: 
-Create Date: 2025-06-25 05:02:40.827070
+Create Date: 2025-06-25 16:54:05.038121
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
-
 import sqlmodel.sql.sqltypes
 
+
+
 # revision identifiers, used by Alembic.
-revision: str = '2a225491dfc6'
+revision: str = '48b02bb6f016'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,7 +47,7 @@ def upgrade() -> None:
     )
     op.create_table('sessions',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('csrf_token', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('ip_address', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('user_agent', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
