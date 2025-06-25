@@ -1,0 +1,57 @@
+[doc("Show this help message")]
+help:
+  @just --list
+
+
+[group("run")]
+[doc("Running app with dev mode")]
+run-dev:
+  @uv run fastapi dev
+
+alias dev := run-dev
+
+[group("run")]
+[doc("Running app with production mode")]
+run-prod:
+  @uv run fastapi run
+
+
+[group('migrations')]
+[doc("Generate migrations based on models")]
+migrate-generate name *flags:
+  @uv run alembic revision {{flags}} --autogenerate -m '{{name}}'
+
+[group('migrations')]
+[doc("Create database migrations")]
+migrate-new name *flags:
+  @uv run alembic revision {{flags}} -m '{{name}}'
+
+[group('migrations')]
+[doc("Running all pending database migrations")]
+migrate-up:
+  @uv run alembic upgrade head
+
+alias migrate := migrate-up
+
+[group('migrations')]
+[doc("Rollback migrations")]
+migrate-down:
+  @uv run alembic downgrade base
+
+[group('migrations')]
+[doc("Recreate database")]
+[confirm("Are you want to re-create database? All data will be destroyed and can't be undo. [y/N]")]
+migrate-fresh: && migrate-up
+  # TODO: read from ENV
+  @rm db.sqlite
+
+[group('migrations')]
+[doc("Run alembic")]
+migrate-raw *command:
+  @uv run alembic {{command}}
+
+
+[group("tests")]
+[doc("Running integration tests using Hurl")]
+test-hurl *flags:
+  @hurl tests/hurl/ --no-output -v {{flags}}
