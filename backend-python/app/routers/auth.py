@@ -1,20 +1,26 @@
 from fastapi import APIRouter, HTTPException
 
-from app.model import user
+from app.models.user_model import LoginRequest, RegisterRequest, UserEntity
+from app.dependencies import DatabaseDep
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/auth/login")
-def login(request: user.LoginRequest):
+@router.post("/login")
+async def login(request: LoginRequest, db: DatabaseDep):
     return {"message": "Login"}
 
 
-@router.post("/auth/register")
-def register(request: user.RegisterRequest):
+@router.post("/register")
+async def register(request: RegisterRequest, db: DatabaseDep):
+    user = UserEntity(
+        id="test-id", name=request.name, email=request.email, password=request.password
+    )
+    db.add(user)
+    db.commit()
     return {"message": "Register"}
 
 
-@router.delete("/auth/logout")
-def logout():
+@router.delete("/logout")
+async def logout():
     raise HTTPException(204)

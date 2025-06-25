@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
-router = APIRouter()
+router = APIRouter(tags=["auth"])
 
 
 @router.get("/sanctum/csrf-cookie")
-def csrfToken():
+async def csrf_token():
     raise HTTPException(204)
