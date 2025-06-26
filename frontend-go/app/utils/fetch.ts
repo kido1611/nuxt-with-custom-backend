@@ -11,6 +11,8 @@ const determineCredentialsMode = () => {
 export const createFetch = (options: { clearUser: () => void }): $Fetch => {
   return $fetch.create({
     credentials: determineCredentialsMode(),
+    retry: 1,
+    retryStatusCodes: [419],
     onRequest: async (context: FetchContext): Promise<void> => {
       if (import.meta.server) {
         // when data is fetched on SSR, append cookie (taken from client) and
@@ -42,6 +44,8 @@ export const createFetch = (options: { clearUser: () => void }): $Fetch => {
     onResponseError: async (context: FetchContext): Promise<void> => {
       if (context.response?.status === 401) {
         options.clearUser();
+      } else if (context.response?.status === 419) {
+        initCsrfToken(true);
       }
     },
   }) as $Fetch;
