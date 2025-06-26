@@ -4,10 +4,16 @@ import { createFetch } from "~/utils/fetch";
 
 export default defineNuxtPlugin(async () => {
   const { user } = useAuth();
+  const router = useRouter();
+  const route = useRoute();
 
   const apiFetch = createFetch({
     clearUser: () => {
       user.value = null;
+
+      if (route.path !== "/login") {
+        router.push("/login");
+      }
     },
   });
 
