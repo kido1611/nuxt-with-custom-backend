@@ -6,9 +6,15 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.98"
 argon2 = { version = "0.5.3", features = ["std"] }
+async-trait = "0.1.88"
 axum = { version = "0.8.4", features = ["macros"] }
-chrono = "0.4.41"
+chrono = { version = "0.4.41", features = ["serde"] }
+config = "0.15.11"
+env_logger = "0.11.8"
 futures = "0.3.31"
+hex = "0.4.3"
+log = "0.4.27"
+rand = "0.9.1"
 serde = { version = "1.0.219", features = ["derive"] }
 sqlx = { version = "0.8.6", features = [
   "runtime-tokio",
@@ -19,6 +25,9 @@ sqlx = { version = "0.8.6", features = [
   "derive",
 ] }
 thiserror = "2.0.12"
+time = { version = "0.3.41", features = ["macros"] }
 tokio = { version = "1.45.1", features = ["full"] }
-uuid = { version = "1.17.0", features = ["v7"] }
+tower-cookies = "0.11.0"
+url = "2.5.4"
+uuid = { version = "1.17.0", features = ["serde", "v7"] }
 validator = { version = "0.20.0", features = ["derive"] }

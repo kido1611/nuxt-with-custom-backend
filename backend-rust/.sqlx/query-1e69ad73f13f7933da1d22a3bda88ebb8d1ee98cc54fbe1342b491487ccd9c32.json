@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT * FROM sessions WHERE id = ? LIMIT 1;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "csrf_token",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "ip_address",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "user_agent",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "expired_at",
+        "ordinal": 5,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 6,
+        "type_info": "Datetime"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 7,
+        "type_info": "Datetime"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "1e69ad73f13f7933da1d22a3bda88ebb8d1ee98cc54fbe1342b491487ccd9c32"
+}
