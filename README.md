@@ -1,9 +1,9 @@
 # User Notes Applications
 
 Example of Nuxt as Frontend using custom backend (Laravel PHP, Go, Rust, Python) using Laravel Sanctum mechanism.
-Backend started from Laravel, then try by porting to Go, Rust and Python.
+Started by creating backend using Laravel, then porting it with Go, Rust, and Python. Included tests using Hurl.
 
-This app in purpose to learn how Laravel authentication is work (Sanctum), use session + cookie, csrf + cors.
+In general this app is created in purpose to learn how Laravel authentication is work (Sanctum), especially session, cookie, csrf, and cors.
 
 ## Used library
 
