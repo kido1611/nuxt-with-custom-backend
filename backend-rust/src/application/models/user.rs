@@ -1,6 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::domain::models::user::User;
 
@@ -23,15 +24,20 @@ impl UserResponse {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 pub struct LoginRequest {
+    #[validate(email, length(max = 100))]
     pub email: String,
+    #[validate(length(max = 32))]
     pub password: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Validate)]
 pub struct RegisterRequest {
+    #[validate(length(max = 100))]
     pub name: String,
+    #[validate(email, length(max = 100))]
     pub email: String,
+    #[validate(length(max = 32))]
     pub password: String,
 }

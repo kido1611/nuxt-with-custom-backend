@@ -1,12 +1,15 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::domain::models::note::Note;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Validate)]
 pub struct CreateNoteRequest {
+    #[validate(length(max = 200))]
     pub title: String,
+    #[validate(length(max = 2000))]
     pub description: Option<String>,
 }
 
