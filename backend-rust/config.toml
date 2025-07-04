@@ -1,0 +1,16 @@
+[app]
+port = 8000
+
+[database]
+url = "sqlite:.data/db.sqlite"
+
+[session]
+domain = "localhost"
+lifetime = 180
+secure = false
+
+[cors]
+origins = ["http://localhost:3000", "https://google.com"]
+methods = ["GET", "POST", "DELETE", "OPTIONS"]
+headers = ["Content-Type"]
+allow_credentials = true

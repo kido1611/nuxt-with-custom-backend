@@ -1,0 +1,34 @@
+help:
+  @just --list
+
+[group("migrate")]
+[doc("Create a new database migration file")]
+migrate-new name:
+  @sqlx migrate add -r {{name}}
+
+[group("migrate")]
+[doc("Running migration")]
+migrate-up:
+  @sqlx migrate run
+
+alias migrate := migrate-up
+
+[group("migrate")]
+[doc("Reverting a database migration")]
+migrate-down:
+  @sqlx migrate revert
+
+[group("migrate")]
+[doc("Recreate database and running migration")]
+migrate-fresh: && migrate-up
+  @sqlx database drop -y
+  @sqlx database create
+
+[group("migrate")]
+[doc("Check database migration status")]
+migrate-info: 
+  @sqlx migrate info
+
+[doc("Integration testing using hurl")]
+test-hurl *ARGS: 
+  @hurl tests/hurl/ {{ARGS}}
