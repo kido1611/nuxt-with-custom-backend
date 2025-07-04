@@ -5,6 +5,9 @@ pub enum Error {
     #[error("Database Error")]
     Database(sqlx::Error),
 
+    #[error("Bad Request")]
+    BadRequest(validator::ValidationErrors),
+
     #[error("Unauthorized")]
     Unauthorized(anyhow::Error),
 
@@ -30,6 +33,12 @@ impl From<sqlx::Error> for Error {
     }
 }
 
+impl From<validator::ValidationErrors> for Error {
+    fn from(value: validator::ValidationErrors) -> Self {
+        Error::BadRequest(value)
+    }
+}
+
 impl IntoResponse for Error {
     fn into_response(self) -> axum::response::Response<Body> {
         match self {
@@ -51,6 +60,10 @@ impl IntoResponse for Error {
             Error::NotFound(error) => {
                 log::error!("{}", error);
                 StatusCode::NOT_FOUND.into_response()
+            }
+            Error::BadRequest(error) => {
+                log::warn!("{}", error);
+                StatusCode::BAD_REQUEST.into_response()
             }
         }
     }

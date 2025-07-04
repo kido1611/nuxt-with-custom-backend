@@ -5,6 +5,7 @@ use argon2::{
     password_hash::{SaltString, rand_core::OsRng},
 };
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::{
     application::models::user::{LoginRequest, RegisterRequest, UserResponse},
@@ -34,6 +35,8 @@ impl UserUseCase {
     }
 
     pub async fn check_user(&self, request: &LoginRequest) -> Result<Option<UserResponse>, Error> {
+        request.validate()?;
+
         let user = match self
             .user_repository
             .get_by_email(request.email.clone())
@@ -52,6 +55,8 @@ impl UserUseCase {
     }
 
     pub async fn create_user(&self, request: &RegisterRequest) -> Result<UserResponse, Error> {
+        request.validate()?;
+
         let user = self
             .user_repository
             .get_by_email(request.email.clone())

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use uuid::Uuid;
+use validator::Validate;
 
 use crate::{
     application::models::note::{CreateNoteRequest, NoteResponse},
@@ -31,6 +32,8 @@ impl NoteUseCase {
         user_id: String,
         request: CreateNoteRequest,
     ) -> Result<NoteResponse, Error> {
+        request.validate()?;
+
         let note_id = Uuid::now_v7();
         let note = NewNote {
             id: note_id,
