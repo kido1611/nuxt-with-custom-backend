@@ -37,6 +37,5 @@ public class AppDbContext : DbContext
           .HasDefaultValueSql("NOW()");
         modelBuilder.Entity<Session>().Property(b => b.UpdatedAt)
           .HasDefaultValueSql("NOW()");
-
     }
 }

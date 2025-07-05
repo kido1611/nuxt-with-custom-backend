@@ -1,25 +1,71 @@
-using Backend.Domain.Entities;
+using Backend.Application;
+using Microsoft.EntityFrameworkCore;
 using Backend.Infrastructure;
 using Backend.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Backend.WebApi.Configurations;
+using Backend.WebApi.Middlewares;
+using Backend.WebApi.Routes;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
+using static System.Boolean;
+
+var logLevelSwitch = new LoggingLevelSwitch
+{
+    MinimumLevel = LogEventLevel.Debug
+};
+
+var logLevelFromEnv = Environment.GetEnvironmentVariable("APP_LOG_LEVEL");
+if (Enum.TryParse<LogEventLevel>(logLevelFromEnv, true, out var parsedLevel))
+{
+    logLevelSwitch.MinimumLevel = parsedLevel;
+}
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .MinimumLevel.ControlledBy(logLevelSwitch)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddInfrastructure(builder.Configuration.GetSection("Database")["ConnectionString"] ?? "");
+
+// Configurations
+builder.Services.Configure<SessionSetting>(builder.Configuration.GetSection("Session"));
+builder.Services.Configure<CorsSetting>(builder.Configuration.GetSection("Cors"));
+
+builder.Host.UseSerilog();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks();
+
+builder.Services.AddCors(options =>
+{
+    var corsSettings = builder.Configuration.GetSection("Cors").Get<CorsSetting>();
+    if (corsSettings == null) return;
+
+    options.AddPolicy(name: "CustomCors", policy =>
+    {
+        policy.WithOrigins(corsSettings.Origins)
+            .WithHeaders(corsSettings.Headers)
+            .WithMethods(corsSettings.Methods);
+        if (corsSettings.AllowCredentials)
+        {
+            policy.AllowCredentials();
+        }
+    });
+});
 
 var app = builder.Build();
 
-bool.TryParse(builder.Configuration.GetSection("Database")["AutoMigrations"], out bool result);
+TryParse(builder.Configuration.GetSection("Database")["AutoMigrations"], out var result);
 if (result)
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.Migrate();
-    }
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
@@ -28,49 +74,20 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("CustomCors");
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseMiddleware<OriginMiddleware>();
+app.UseMiddleware<SessionMiddleware>();
+app.UseMiddleware<CsrfMiddleware>();
+app.UseMiddleware<GuestMiddleware>();
+app.UseMiddleware<AuthMiddleware>();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapSanctumRoutes();
+app.MapHealthRoutes();
+app.MapAuthRoutes();
+app.MapUserRoutes();
+app.MapNoteRoutes();
 
-app.MapGet("/", async (AppDbContext db) =>
-{
-    var user = new User
-    {
-        Id = Guid.CreateVersion7(),
-        Name = "Name",
-        Email = "email@email.com",
-        Password = "password"
-    };
-
-    db.Users.Add(user);
-
-    await db.SaveChangesAsync();
-
-    return "Alive";
-});
+app.MapHealthChecks("/healthz");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
-

@@ -1,2 +1,4 @@
 app.db
+app.db*
 app-prod.db
+app-prod.db*

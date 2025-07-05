@@ -24,6 +24,14 @@ migrate-fresh: && migrate-up
   @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ database drop -f
 
 
-[doc("Run web Api")]
+[doc("Run web Api with watcher")]
 dev:
+  @dotnet watch --project src/Backend.WebApi
+
+[doc("Run web Api")]
+run:
   @dotnet run --project src/Backend.WebApi
+
+[doc("Integration testing using hurl")]
+test-hurl *ARGS="tests/hurl/": 
+  @hurl {{ARGS}}

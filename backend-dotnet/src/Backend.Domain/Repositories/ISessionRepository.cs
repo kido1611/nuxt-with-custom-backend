@@ -6,6 +6,6 @@ public interface ISessionRepository
 {
     Task<Session> CreateAsync(Session session);
     Task<Session?> GetByIdAsync(string id);
-    Task<Session> UpdateExpiredAsync(Session session);
+    Task<Session> UpdateAsync(Session session);
     Task DeleteByIdAsync(string id);
 }
