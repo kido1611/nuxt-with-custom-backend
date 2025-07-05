@@ -1,0 +1,29 @@
+help:
+  @just --list
+
+[group("migrate")]
+[doc("Create new migration with synchronize column from entity")]
+migrate-new NAME:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ migrations add {{NAME}}
+
+[group("migrate")]
+[doc("Generate migration by synchronize with entity")]
+migrate-up:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ database update
+
+alias migrate := migrate-up
+
+[group("migrate")]
+[doc("Run raw dotnet ef")]
+migrate-raw *ARGS:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ {{ARGS}}
+
+[group("migrate")]
+[doc("Recreate database")]
+migrate-fresh: && migrate-up
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ database drop -f
+
+
+[doc("Run web Api")]
+dev:
+  @dotnet run --project src/Backend.WebApi
