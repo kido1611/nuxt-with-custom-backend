@@ -1,0 +1,37 @@
+help:
+  @just --list
+
+[group("migrate")]
+[doc("Create new migration with synchronize column from entity")]
+migrate-new NAME:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ migrations add {{NAME}}
+
+[group("migrate")]
+[doc("Generate migration by synchronize with entity")]
+migrate-up:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ database update
+
+alias migrate := migrate-up
+
+[group("migrate")]
+[doc("Run raw dotnet ef")]
+migrate-raw *ARGS:
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ {{ARGS}}
+
+[group("migrate")]
+[doc("Recreate database")]
+migrate-fresh: && migrate-up
+  @dotnet ef --project src/Backend.Infrastructure/ --startup-project src/Backend.WebApi/ database drop -f
+
+
+[doc("Run web Api with watcher")]
+dev:
+  @dotnet watch --project src/Backend.WebApi
+
+[doc("Run web Api")]
+run:
+  @dotnet run --project src/Backend.WebApi
+
+[doc("Integration testing using hurl")]
+test-hurl *ARGS="tests/hurl/": 
+  @hurl {{ARGS}}
